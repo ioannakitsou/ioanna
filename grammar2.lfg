@@ -1,0 +1,204 @@
+DEMO   ENGLISH   CONFIG (1.0)
+  ROOTCAT   S.
+  FILES  .
+  LEXENTRIES   (DEMO ENGLISH).
+  TEMPLATES (DEMO ENGLISH). 
+  RULES   (DEMO ENGLISH).
+  GOVERNABLERELATIONS    SUBJ OBJ OBJ2 COMP XCOMP OBL OBL-?+.
+  SEMANTICFUNCTIONS    ADJUNCT  TOPIC FOCUS POSS STANDARD.
+  NONDISTRIBUTIVES    NUM PERS CONJ-FORM.
+  EPSILON   e.
+  OPTIMALITYORDER NOGOOD.
+
+----
+
+DEMO   ENGLISH   RULES (1.0)
+
+   S --> NP: (^ SUBJ)=!
+	     (! CASE)=nom;
+ 	 VP: ^=!;
+	 (PUNCT).
+
+
+   VP --> (AUX)   "auxiliary introduced for passive" 
+	  V: ^=!; 
+ 	  (NP: (^ OBJ)=!   "optional direct object"
+	       (! CASE)=acc)
+ 	  (PP: (^ OBL-AG) = !).  "oblique agent of passive" 
+
+
+   NP --> (D)
+ 	  N. 
+
+   PP --> P    "this needs to be more complicated eventually"
+      	  NP. 
+
+----
+DEMO   ENGLISH   TEMPLATES (1.0)
+
+   PASS(FRAME) = { FRAME "no passive, just give back subcat frame"
+	          (^ PASSIVE) = - "no passive"
+	  | FRAME "passive"
+	    (^ PASSIVE) = + "mark as such"
+	    (^ PARTICIPLE) =c past "make sure to have a past participle"
+	    (^ OBJ)-->(^ SUBJ) "obj goes to subj"
+	    { (^ SUBJ)-->(^ OBL-AG) "either make subj obl-ag"
+	    | (^ SUBJ)--> NULL "or delete"
+	    }
+	  }. 
+
+   
+    DAT-SHIFT(FRAME) =
+ { FRAME “base case”
+ | FRAME “or dative shift”
+ (^ OBJ)--> (^ OBJ2)
+ (^ OBL-TO)--> (^ OBJ)
+}.
+
+
+ "transitives can passivize"
+
+   TRANS(P) = @(PASS (^ PRED)='P<(^ SUBJ) (^ OBJ)>').
+
+   INTRANS(P) = (^ PRED) = 'P<(^SUBJ)>'.
+
+   OPT-TRANS(P) = { (^ PRED) = 'P<(^SUBJ)(^OBJ)>'   "P is a variable"
+	          | (^ PRED) = 'P<(^SUBJ)>' }.  "this template takes one argument:  P"
+	  
+   TENSE(T) = (^ TENSE) = T.  "the more general case"
+
+   MOOD(M) = (^ MOOD) = M.
+
+   VPRES = @(TENSE pres) 
+	   @(MOOD indicative). 
+
+   VPAST = @(TENSE past) 
+	  @(MOOD indicative). 
+
+   PRED(P) = (^ PRED) = 'P'. 
+
+   PASTP = (^ PARTICIPLE) = past. 
+
+----
+
+DEMO ENGLISH LEXICON (1.0)
+
+
+bone	  N * (^ PRED) = 'bone'
+	      (^ NUM) = sg
+	      (^ PERS) = 3. 
+
+bones 	  N * (^ PRED) = 'bone'
+	      (^ NUM) = pl
+	      (^ PERS) = 3. 
+
+girl      N * (^ PRED) = 'girl'
+	      (^ NUM) = sg
+	      (^ PERS) = 3.
+
+homework  N * (^ PRED) = 'homework'
+	      (^ NUM) = sg
+	      (^ PERS) = 3. 
+
+zookeeper N * (^ PRED) = 'zookeeper'
+	      (^ NUM) = sg
+	      (^ PERS) = 3.
+
+gorilla   N * (^ PRED) = 'gorilla'
+	      (^ NUM) = sg
+	      (^ PERS) = 3.
+
+gorillas  N * (^ PRED) = 'gorilla'
+	      (^ NUM) = pl
+	      (^ PERS) = 3.
+
+banana  N * (^ PRED) = 'banana'
+	      (^ NUM) = sg
+	      (^ PERS) = 3.
+
+bananas N * (^ PRED) = 'bananas'
+	      (^ NUM) = pl
+	      (^ PERS) = 3.
+
+dog 	  N * (^ PRED) = 'dog'
+	      (^ NUM) = sg
+	      (^ PERS) = 3. 
+
+dogs 	  N * (^ PRED) = 'dog'
+	      (^ NUM) = pl
+	      (^ PERS) = 3. 
+
+ate 	  V * @(OPT-TRANS eat)  "template for optionally transitive verbs"
+	      (^ TENSE) = past
+	      (^ MOOD) = indicative.
+
+eats 	  V * @(OPT-TRANS eat)
+	      @VPRES. 
+
+drinks   V * @(OPT-TRANS drink)
+             @VPRES. 
+
+devoured  V * @(TRANS devour) 
+	      { @VPAST
+	      | @PASTP "past participle, for passive" 
+	      }. 
+
+gives     V * @(OPT-TRANS give)
+             @VPRES.
+
+gave      V * @(TRANS give) 
+	      { @VPAST
+	      | @PASTP "past participle, for passive" 
+	      }. 
+
+devours   V * @(TRANS devour)
+	    "(^ PRED) = 'devour<(^SUBJ)(^OBJ)> need to fix this, no Passive -"
+       	    """(^ TENSE) = pres
+	    (^ MOOD) = indicative"""
+            @VPRES 
+            (^ SUBJ PERS) = 3
+            (^ SUBJ NUM) = sg.
+
+appears   V *  (^ PRED) = 'appear<(^SUBJ)>' 
+       	    (^ TENSE) = pres
+	    (^ MOOD) = indicative
+            (^ SUBJ PERS) = 3
+            (^ SUBJ NUM) = sg.
+
+sleeps   V *  (^ PRED) = 'sleep<(^SUBJ)>' 
+       	      (^ TENSE) = pres
+	      (^ MOOD) = indicative
+              (^ SUBJ PERS) = 3 
+              (^ SUBJ NUM) = sg.
+
+sleep 	  V * (^ PRED) = 'sleep<(^SUBJ)>' 
+	      (^ TENSE) = pres
+	      (^ MOOD) = indicative
+	      { (^ SUBJ NUM) = pl "either it is plural"
+	      | (^ SUBJ PERS) ~= 3 "or it is singular and not 3rd person"
+		(^ SUBJ NUM) = sg}.
+
+"prepositions"
+
+by	  P * (^ PFORM) = by.  "this needs to be more complicated eventually"
+
+"auxiliaries"
+
+was 	  AUX * @(TENSE past)
+		{ (^ SUBJ PERS) = 1
+                | (^ SUBJ PERS) = 3
+                }
+                (^ SUBJ NUM) = sg. 
+
+"determiners"
+
+the  D *  (^ DEF) = +.
+
+a  D *  (^ DEF) = -   "this indefinite only marks singulars" 
+        (^ NUM) = sg.
+
+. PUNCT * .
+
+
+
+----
